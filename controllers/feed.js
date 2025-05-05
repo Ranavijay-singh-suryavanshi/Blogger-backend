@@ -4,20 +4,23 @@ const path = require('path');
 const User = require('../models/user');
 
 
-exports.getPosts = (req,res,next)=>{
+exports.getPosts = async (req,res,next)=>{
     const currentPage = req.query.page || 1;
     const perPage = 2;
     let totalItems;
-    Post.find.countDocuments().then(count =>{
-        totalItems = count;
-        return Post.find().skip((currentPage-1)*perPage).limit(perPage);
-    }).then(posts=>{
+    try{
+    totalItems = await Post.find.countDocuments();
+        const post = await Post.find().skip((currentPage-1)*perPage).limit(perPage);
+   
         res.status(200).json({
             message:"Fetched post successfully",
             posts:posts,
             totalItems:totalItems
-        })
-    }).catch(err=>console.log(err))
+
+    })
+}catch(err){
+    console.log(err);
+}
 
     Post.find().then(posts=>{
         res.status(200).json({
